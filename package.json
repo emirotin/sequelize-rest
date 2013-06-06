@@ -1,0 +1,27 @@
+{
+  "name": "sequelize-rest",
+  "version": "0.0.1",
+  "description": "REST API automation for Sequelize",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/emirotin/sequelize-rest.git"
+  },
+  "keywords": [
+    "sequelize",
+    "orm",
+    "mysql",
+    "postgresql",
+    "rest"
+  ],
+  "author": "Eugene Mirotin",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "8844ad90c5ade1a92f1fc24fc28e3a9aada323a8",
+  "bugs": {
+    "url": "https://github.com/emirotin/sequelize-rest/issues"
+  }
+}
