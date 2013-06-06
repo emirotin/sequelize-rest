@@ -15,13 +15,21 @@
     "orm",
     "mysql",
     "postgresql",
-    "rest"
+    "sqlite",
+    "rest",
+    "json"
   ],
   "author": "Eugene Mirotin",
   "license": "BSD",
   "readmeFilename": "README.md",
-  "gitHead": "8844ad90c5ade1a92f1fc24fc28e3a9aada323a8",
   "bugs": {
     "url": "https://github.com/emirotin/sequelize-rest/issues"
+  },
+  "dependencies": {
+    "coffee-script": "~1.6.3"
+  },
+  "devDependencies": {
+    "sequelize": "~2.0.0-alpha1",
+    "sqlite3": "~2.1.7"
   }
 }
