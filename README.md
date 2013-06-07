@@ -3,4 +3,4 @@ sequelize-rest
 
 REST API automation for Sequelize
 
-WIP!
+Documentation to come, for now see test/index for configuration options.
