@@ -26,7 +26,9 @@
     "url": "https://github.com/emirotin/sequelize-rest/issues"
   },
   "dependencies": {
-    "coffee-script": "~1.6.3"
+    "coffee-script": "~1.6.3",
+    "underscore": "~1.4.4",
+    "underscore.string": "~2.3.1"
   },
   "devDependencies": {
     "sequelize": "~2.0.0-alpha1",

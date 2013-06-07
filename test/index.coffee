@@ -1,5 +1,5 @@
 Sequelize = require 'sequelize'
-sequelizeRest = require('./index')
+sequelizeRest = require('../index')
 
 sequelize = new Sequelize 'db', 'user', 'pwd',
   dialect: 'sqlite'
@@ -73,5 +73,7 @@ Project = sequelize.define 'Project', {
   }
 
 Project.belongsTo User
+
+console.log 111
 
 sequelizeRest sequelize

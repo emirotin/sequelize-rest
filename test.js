@@ -1,2 +1,2 @@
 require('coffee-script');
-require('./test.coffee');
+require('./test/index');
