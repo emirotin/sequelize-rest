@@ -4,6 +4,14 @@ _.mixin _s.exports()
 
 defaults =
   user: (req) -> req.user
+  validateId: (id) ->
+    if id and not id.match /^\d+$/
+      return "ID must be a number"
+  resourceToModelName: (resourceName) ->
+    typeName = _(resourceName).rtrim('s')
+    modelName = _(typeName).classify()
+
+defaultCommonConfig =
   publicReadFields: ['createdAt', 'updatedAt', 'id']
   excludeSaveFields: ['createdAt', 'updatedAt', 'id']
   canRead: (user, idOrAll) -> true
@@ -38,42 +46,43 @@ mergeConfig = (config, commonConfig) ->
         modelConfig[settingName] = modelConfig[settingName].concat settingValue
   return res
 
-module.exports = (sequelize, commonConfig) ->
+module.exports = (sequelize, options, commonConfig) ->
   daos = sequelize.daoFactoryManager.daos
-  commonConfig = _.extend {}, defaults, commonConfig
-  getUser = commonConfig.user
-  delete commonConfig.user
+  options = _.extend {}, defaults, options
+  commonConfig = _.extend {}, defaultCommonConfig, commonConfig
 
   models = {}
-  modelConfigs = {}
+  modelsConfig = {}
 
   for model in daos
     models[model.name] = model
 
-    modelConfigs[model.name] = modelConfig = _.pick model, ['canRead', 'canReadPrivate', 'canWrite', 'canDelete', 'beforeCreate']
+    modelsConfig[model.name] = modelConfig = _.pick model, ['canRead', 'canReadPrivate', 'canWrite', 'canDelete', 'beforeCreate']
     modelConfig.eagerLoad = model.eagerLoad?()
-    modelConfig.publicReadFields = (name for name, attr of model.rawAttributes when attr.public)
+    publicReadFields = (name for name, attr of model.rawAttributes when attr.public)
+    if model.extraPublicReadFields
+      publicReadFields = publicReadFields.concat model.extraPublicReadFields()
+    modelConfig.publicReadFields = publicReadFields
     modelConfig.privateReadFields = (name for name, attr of model.rawAttributes when attr.private)
     modelConfig.excludeSaveFields = (name for name, attr of model.rawAttributes when attr.excludeSave)
 
-  modelConfigs = mergeConfig modelConfigs, commonConfig
+  modelsConfig = mergeConfig modelsConfig, commonConfig
 
   return (req, res) ->
     # map HTTP method to readable name
     action = methodToAction[req.method.toLowerCase()]
     # get type name and id from url
-    typeName = _(req.params.type).rtrim('s')
+    modelName = options.resourceToModelName(req.params.type)
     id = req.params.id
 
-    user = getUser req
+    user = options.user?(req)
 
     # shortcut
-    if typeName == 'user' and id == 'current'
+    if modelName == 'User' and id == 'current'
       return ok res, user
       #id = user?.id
 
     # get ORM model
-    modelName = _(typeName).classify()
     model = models[modelName]
 
     # id is required for every operation except find (= findAll) and create
@@ -81,8 +90,9 @@ module.exports = (sequelize, commonConfig) ->
       return error res, 500, "ID not set for #{action} action"
 
     # except of shortcuts id must be numeric
-    if id and not id.match /^\d+$/
-      return error res, 500, "ID must be a number"
+    idError = options.validateId?(id)
+    if idError
+      return error res, 500, idError
 
     # if id is defined convert it to Number
     if id
